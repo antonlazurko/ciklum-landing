@@ -4,14 +4,14 @@ const clickedLogosArray = [];
 
 const list = document.querySelector('#list');
 const interactiveImage = document.querySelector('.interactive-image');
-const submitButton = document.querySelector('#submit');
-const result = document.querySelector('#result');
+const form = document.querySelector('#form');
+const loader = document.querySelector('#loader');
 
 interactiveImage.addEventListener('load', () => {
     handleIconsVisible();
 });
 list.addEventListener('click', onClickImg);
-submitButton.addEventListener('click', onSubmit);
+form.addEventListener('submit', onSubmit);
 
 
 function handleIconsVisible() {
@@ -19,7 +19,6 @@ function handleIconsVisible() {
 };
 
 function onClickImg(e) {
-    result.innerText = ''
     if (e?.target?.nodeName === 'IMG' && e.target.id) {
         if (!clickedLogosArray.includes(e.target.id)) {
             clickedLogosArray.push(e.target.id)
@@ -29,18 +28,17 @@ function onClickImg(e) {
 }
 function onSubmit(event) {
     event.preventDefault();
-    result.innerText = clickedLogosArray.length;
-    clickedLogosArray.length = 0;
-    handleIconsVisible();
-
-    // sendDataToGoogleSheet(); TODO: add after form will be done
-    // this.reset();
+    const result = clickedLogosArray.length
+    sendDataToGoogleSheet(result);
+    this.reset();
 }
 
-function sendDataToGoogleSheet() {
+function sendDataToGoogleSheet(result) {
 
     const formData = new FormData(form)
-    formData.append('result', clickedArray.length)
+    formData.append('result', result)
+    loader.style.display = 'flex'
+    form.style.display = 'none'
 
     fetch(SHEET_URL, {
         method: 'POST',
@@ -49,8 +47,7 @@ function sendDataToGoogleSheet() {
     .then(response => {
         if (response.ok) {
         console.log('Data successfully sent to Google Sheet');
-        result.innerText = `Total Strikes: ${clickedArray.length}`;
-        clickedArray.length = 0;
+        clickedLogosArray.length = 0;
         handleIconsVisible()
         } else {
         console.error('Error sending data to Google Sheet');
@@ -58,5 +55,9 @@ function sendDataToGoogleSheet() {
     })
     .catch(error => {
         console.error('Error:', error);
+    })
+    .finally(() => {
+        loader.style.display = 'none'
+        form.style.display = 'flex'
     });
 }
