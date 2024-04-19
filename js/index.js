@@ -10,7 +10,7 @@ window.addEventListener('load', function() {
 
     list.addEventListener('click', onClickImg);
     form.addEventListener('submit', onSubmit);
-    handleIconsVisible()
+    handleIconsVisible();
 
     function handleIconsVisible() {
         document.querySelectorAll('li').forEach((icon) => icon.style.opacity = 1);
@@ -27,40 +27,38 @@ window.addEventListener('load', function() {
             }
         }
     }
-    function onSubmit(event) {
+    async function onSubmit(event) {
         event.preventDefault();
-        const result = clickedLogosArray.length
+        const result = clickedLogosArray.length;
         sendDataToGoogleSheet(result);
         this.reset();
     }
 
-    function sendDataToGoogleSheet(result) {
+    async function sendDataToGoogleSheet(result) {
+        const formData = new FormData(form);
+        formData.append('result', result);
+        loader.style.display = 'flex';
+        form.style.display = 'none';
 
-        const formData = new FormData(form)
-        formData.append('result', result)
-        loader.style.display = 'flex'
-        form.style.display = 'none'
+        try {
+            const response = await fetch(SHEET_URL, {
+                method: 'POST',
+                body: formData,
+            });
 
-        fetch(SHEET_URL, {
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => {
             if (response.ok) {
-            console.log('Data successfully sent to Google Sheet');
-            clickedLogosArray.length = 0;
-            scoreEl.innerHTML = `Score: <b>${result}</b>`
-            handleIconsVisible()
+                console.log('Data successfully sent to Google Sheet');
+                clickedLogosArray.length = 0;
+                scoreEl.innerHTML = `Score: <b>${result}</b>`;
+                handleIconsVisible();
             } else {
-            console.error('Error sending data to Google Sheet');
+                throw new Error('Error sending data to Google Sheet');
             }
-        })
-        .catch(error => {
+        } catch (error) {
             console.error('Error:', error);
-        })
-        .finally(() => {
-            loader.style.display = 'none'
-            form.style.display = 'flex'
-        });
+        } finally {
+            loader.style.display = 'none';
+            form.style.display = 'flex';
+        }
     }
 })
