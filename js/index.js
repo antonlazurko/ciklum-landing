@@ -1,4 +1,4 @@
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwfbTLf6LQ5dtu5T2U9Df2mPMbf-g49VFOlgkwfQ7aykDB1dOXGTv1cDN0b0hj-QUJl/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxf8kofyXmxzCvkcj1-2riFWFfpJ-g0J51psZZkGxOVCtJYaU04NLTdI1zm65ygBCmy/exec';
 
 const clickedLogosArray = [];
 
@@ -50,6 +50,7 @@ window.addEventListener('load', function() {
                 console.log('Data successfully sent to Google Sheet');
                 clickedLogosArray.length = 0;
                 scoreEl.innerHTML = `Score: <b>${result}</b>`;
+                scoreEl.scrollIntoView({ behavior: 'smooth' });
                 handleIconsVisible();
             } else {
                 throw new Error('Error sending data to Google Sheet');
